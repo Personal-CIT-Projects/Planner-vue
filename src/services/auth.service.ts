@@ -1,15 +1,9 @@
 import axios from "axios";
 import {ref} from "vue";
 
-axios.defaults.baseURL = "https://localhost:7050";
-
 const AUTH_INFO_KEY = "AUTH_INFO"
 
 const user = ref<UserInfo|null>(null)
-
-setInterval(() => {
-  refreshUserInfo()
-}, 5000)
 
 export function refreshUserInfo() {
   axios.get<AuthenticatedResponse>("/auth")
@@ -17,7 +11,7 @@ export function refreshUserInfo() {
     .catch(err => console.log(err))
 }
 
-function storeUserInfo(val:AuthenticatedResponse) {
+export function storeUserInfo(val:AuthenticatedResponse) {
   console.log("storing info", val)
   user.value = val.user ?? null
   if(!val.authenticated) localStorage.removeItem(AUTH_INFO_KEY)
@@ -30,6 +24,18 @@ export default function isAuthenticated() {
 
 export function getUserInfo() {
   return user.value ?? null
+}
+
+export function authenticate(username:string, password:string) {
+  axios.get("/auth/login")
+    .then(() => refreshUserInfo())
+    .catch(err => console.log(err))
+}
+
+export function logout() {
+  axios.get("/auth/logout")
+    .then(() => storeUserInfo({user: null, authenticated: false, roles: []}))
+    .catch(err => console.log(err))
 }
 
 export function getNameFromUser(user:UserInfo|null) {

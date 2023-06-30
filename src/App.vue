@@ -26,6 +26,7 @@ v-main {
 import init from "@/config/axios.config";
 import router from "./router";
 import Navigation from "@/components/navigation/Navigation.vue";
+import {refreshUserInfo} from "@/services/auth.service";
 
 export default {
   components: {Navigation},
@@ -36,6 +37,12 @@ export default {
   },
   beforeCreate() {
     init()
+  },
+  created() {
+    refreshUserInfo()
+    setInterval(() => {
+      refreshUserInfo()
+    }, 10000)
   }
 }
 </script>
